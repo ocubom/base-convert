@@ -7,6 +7,10 @@ conversion is performed with the [BC Math Extension][] to avoid native PHP
 
 Also provides a safe [Crockford Base32][] encoding/decoding class.
 
+| License | Version | Status | SensioLabsInsight |
+| ------- | ------- | ------ | ----------------- |
+| [![License](https://poser.pugx.org/ocubom/base-convert/license.svg)][0] | [![Latest Stable Version](https://poser.pugx.org/ocubom/base-convert/v/stable.svg)](https://packagist.org/packages/ocubom/base-convert) [![Latest Unstable Version](https://poser.pugx.org/ocubom/base-convert/v/unstable.svg)](https://packagist.org/packages/ocubom/base-convert) | [![Build Status](https://travis-ci.org/ocubom/base-convert.svg)](https://travis-ci.org/ocubom/base-convert) [![Coverage Status](https://img.shields.io/coveralls/ocubom/base-convert.svg)](https://coveralls.io/r/ocubom/base-convert) | [![SensioLabsInsight](https://insight.sensiolabs.com/projects/5c3634fb-2d32-4986-a4c3-857177d4c07d/big.png)](https://insight.sensiolabs.com/projects/5c3634fb-2d32-4986-a4c3-857177d4c07d) |
+
 Installation
 ------------
 
