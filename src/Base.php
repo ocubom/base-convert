@@ -33,58 +33,100 @@ abstract class Base
      */
     public static function convert($number, $frombase = 10, $tobase = 36)
     {
-        // No base change requested
-        if ($frombase === $tobase) {
-            return $number;
+        if ($frombase == $tobase) {
+            return $number;  // No conversion needed
         }
 
-        // Check special base for binary numbers
-        if ('bin' === $frombase) {
-            $number   = bin2hex($number);
-            $frombase = 16;
+        // Get pre & post conversion process
+        list($prefn,  $frombase) = self::cleanFromBase($frombase);
+        list($postfn, $tobase)   = self::cleanToBase($tobase);
+
+        // Perform conversion
+        $result = $prefn($number);
+        if (intval($frombase) != intval($tobase)) {
+            $result = self::convertFromBase10(self::convertToBase10($result, $frombase), $tobase);
         }
-        $cleanfn = null; // "do-nothing"
-        if ('bin' === $tobase) {
-            $cleanfn = 'hex2bin';
-            $tobase  = 16;
-        }
+        $result = $postfn($result);
 
-        // Clean argument
-        $number = trim($number);
+        return empty($result) ? '0' : $result;
+    }
 
-        // Do not convert same base
-        if (intval($frombase) === intval($tobase)) {
-            return empty($cleanfn) ? $number : $cleanfn($number);
-        }
-
-        // Convert value to base-10 if needed
-        $base10 = $number;
-        if (intval($frombase) != 10) {
-            $len    = strlen($number);
-            $base10 = 0;
-
-            for ($i = 0; $i < $len; $i++) {
-                $digit  = base_convert($number[$i], $frombase, 10);
-                $base10 = bcadd(bcmul($base10, $frombase), $digit);
-            }
+    /**
+     * Clean source number base
+     *
+     * @param mixed $base Source base
+     *
+     * @return array Pre-process function and returned base of the function
+     */
+    protected static function cleanFromBase($base)
+    {
+        if ('bin' === $base) {
+            return array('bin2hex', 16);
         }
 
-        // Convert value from base-10 if needed
-        $result = $base10;
-        if (intval($tobase) != 10) {
-            $result = '';
-            while (bccomp($base10, '0', 0) > 0) {
-                $module = intval(bcmod($base10, $tobase));
-                $result = base_convert($module, 10, $tobase) . $result;
-                $base10 = bcdiv($base10, $tobase, 0);
-            }
+        return array('trim', $base);
+    }
 
-            if (empty($result)) {
-                $result = '0';
-            }
+    /**
+     * Clean target number base
+     *
+     * @param mixed $base Target base
+     *
+     * @return array Post-process function and input base of the function
+     */
+    protected static function cleanToBase($base)
+    {
+        if ('bin' === $base) {
+            return array('hex2bin', 16);
         }
 
-        // Postprocess result
-        return empty($cleanfn) ? $result : $cleanfn($result);
+        return array('trim', $base);
+    }
+
+    /**
+     * Convert a number from base10 to the desired base
+     *
+     * @param mixed $number The number to convert in base10
+     * @param mixed $base   The new base
+     *
+     * @return mixed $number converted to $base
+     */
+    protected static function convertFromBase10($number, $base)
+    {
+        if (intval($base) == 10) {
+            return empty($number) ? '0' : $number; // No conversion needed
+        }
+
+        $value = '';
+        while (bccomp($number, '0', 0) > 0) {
+            $module = intval(bcmod($number, $base));
+            $value  = base_convert($module, 10, $base) . $value;
+            $number = bcdiv($number, $base, 0);
+        }
+
+        return empty($value) ? '0' : $value;
+    }
+
+    /**
+     * Convert the number from its base to base10
+     *
+     * @param mixed $number The number to convert
+     * @param mixed $base   The base of the number
+     *
+     * @return mixed $number converted to base10
+     */
+    protected static function convertToBase10($number, $base)
+    {
+        if (intval($base) == 10) {
+            return empty($number) ? '0' : $number; // No conversion needed
+        }
+
+        $value = 0;
+        for ($i = 0; $i < strlen($number); $i++) {
+            $digit = base_convert($number[$i], $base, 10);
+            $value = bcadd(bcmul($value, $base), $digit);
+        }
+
+        return empty($value) ? '0' : $value;
     }
 }
