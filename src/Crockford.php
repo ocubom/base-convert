@@ -76,8 +76,16 @@ abstract class Crockford
      */
     public static function decode($number, $base = 10, $checksum = false)
     {
-        // Clean number
+        // Clean and check number
         $crockford = strtoupper(trim(str_replace('-', '', $number)));
+
+        if ($invalid = self::check($crockford)) {
+            throw new \RuntimeException(sprintf(
+                'Found invalid characters "%s" for crockford number "%s"',
+                implode('', $invalid),
+                $number
+            ));
+        }
 
         // Recode symbols (base-32) and convert to base-10
         $base32 = strtr(
@@ -99,6 +107,30 @@ abstract class Crockford
 
         // Convert to desired base
         return Base::convert($base10, 10, $base);
+    }
+
+    /**
+     * Check if the number uses only Crockford valid characters
+     *
+     * @param mixed $number The crockford number
+     *
+     * @return mixed An array of invalid characters detected or false otherwhise
+     */
+    protected static function check($number)
+    {
+        $invalid = array_diff(
+            str_split($number),
+            str_split(self::CROCKFORD)
+        );
+
+        if (empty($invalid)) {
+            return false; // Crockford number is valid
+        }
+
+        $invalid = array_unique($invalid);
+        usort($invalid, 'strnatcasecmp');
+
+        return $invalid;
     }
 
     /**

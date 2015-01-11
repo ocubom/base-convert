@@ -68,6 +68,97 @@ class BaseTest extends TestCase
     }
 
     /**
+     * Invalid bases (<2) must generate an exception
+     */
+    public function testInvalidFromBaseLower()
+    {
+        $this->setExpectedException(
+            '\\RuntimeException',
+            'Invalid "from base": must be in the range [2-36] but found "0"'
+        );
+
+        Base::Convert('', 0, 10);
+    }
+
+    /**
+     * Invalid bases (>36) must generate an exception
+     */
+    public function testInvalidFromBaseUpper()
+    {
+        $this->setExpectedException(
+            '\\RuntimeException',
+            'Invalid "from base": must be in the range [2-36] but found "37"'
+        );
+
+        Base::Convert('', 37, 10);
+    }
+
+    /**
+     * Invalid bases (<2) must generate an exception
+     */
+    public function testInvalidToBaseLower()
+    {
+        $this->setExpectedException(
+            '\\RuntimeException',
+            'Invalid "to base": must be in the range [2-36] but found "0"'
+        );
+
+        Base::Convert('', 10, 0);
+    }
+
+    /**
+     * Invalid bases (>36) must generate an exception
+     */
+    public function testInvalidToBaseUpper()
+    {
+        $this->setExpectedException(
+            '\\RuntimeException',
+            'Invalid "to base": must be in the range [2-36] but found "37"'
+        );
+
+        Base::Convert('', 10, 37);
+    }
+
+    /**
+     * Only number, hex or bin from bases are allowed
+     */
+    public function testUnknownFromBase()
+    {
+        $this->setExpectedException(
+            '\\RuntimeException',
+            'Unknown base "notvalid"'
+        );
+
+        Base::Convert('', 'notvalid', 10);
+    }
+
+    /**
+     * Only number, hex or bin to bases are allowed
+     */
+    public function testUnknownToBase()
+    {
+        $this->setExpectedException(
+            '\\RuntimeException',
+            'Unknown base "notvalid"'
+        );
+
+        Base::Convert('', 10, 'notvalid');
+    }
+
+    /**
+     * Invalid characters on number must generate an exception
+     */
+    public function testInvalidNumberBase()
+    {
+        $this->setExpectedException(
+            '\\RuntimeException',
+            'Found invalid characters "ghi" for base-16 on number "2i4h1a3g0"'
+        );
+
+        Base::Convert('2i4h1a3g0', 16, 36);
+    }
+
+    /**
      * Base conversions
      *
      * @return array
@@ -96,10 +187,10 @@ class BaseTest extends TestCase
             ),
             // Must return the same values than native functions
             array(
-                array($rand, 10),
+                array($rand, 'dec'),
                 array(decbin($rand), 2),
-                array(decoct($rand), 8),
-                array(dechex($rand), 16),
+                array(decoct($rand), 'oct'),
+                array(dechex($rand), 'hex'),
                 array(hex2bin(dechex($rand)), 'bin'),
             ),
             // Random UUID: C3E51D3E-996C-11E4-9FF0-73AF89BEA664

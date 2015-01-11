@@ -51,13 +51,26 @@ class CrockfordTest extends TestCase
      */
     public function testCrockfordException()
     {
-        // Invalid crockford number => throw an exception
         $this->setExpectedException(
             '\\RuntimeException',
             'Invalid crockford checksum for {01}: found "1" must be "0"'
         );
 
         Crockford::decode('01', 10, true);
+    }
+
+    /**
+     * Invalid characters on number must generate an exception
+     */
+    public function testInvalidDigits()
+    {
+        $number = Crockford::CROCKFORD . '-(/)-' . strtolower(Crockford::CROCKFORD);
+        $this->setExpectedException(
+            '\\RuntimeException',
+            sprintf('Found invalid characters "()/" for crockford number "%s"', $number)
+        );
+
+        Crockford::decode($number, 10, false);
     }
 
     /**

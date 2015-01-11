@@ -21,6 +21,11 @@ use \RuntimeException;
 abstract class Base
 {
     /**
+     * Base-36 alphabet
+     */
+    const BASE36_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+    /**
      * Safe convert of numbers using BC math extension
      *
      * {@see http://www.php.net/manual/es/function.base-convert.php#109660}
@@ -43,12 +48,42 @@ abstract class Base
 
         // Perform conversion
         $result = $prefn($number);
-        if (intval($frombase) != intval($tobase)) {
+        if ($frombase != $tobase) {
             $result = self::convertFromBase10(self::convertToBase10($result, $frombase), $tobase);
         }
         $result = $postfn($result);
 
         return empty($result) ? '0' : $result;
+    }
+
+    /**
+     * Check if number has valid digits
+     *
+     * @param mixed   $number The number to check
+     * @param integer $base   The base of $number
+     *
+     * @return boolean False if the number is valid
+     */
+    protected static function checkNumber($number, $base)
+    {
+        $invalid = array_diff(
+            str_split(strtolower($number) ?: '0'),
+            str_split(substr(self::BASE36_ALPHABET, 0, $base))
+        );
+
+        if (empty($invalid)) {
+            return false; // Number is valid
+        }
+
+        $invalid = array_unique($invalid);
+        usort($invalid, 'strnatcasecmp');
+
+        throw new \RuntimeException(sprintf(
+            'Found invalid characters "%s" for base-%d on number "%s"',
+            implode('', $invalid),
+            $base,
+            $number
+        ));
     }
 
     /**
@@ -60,11 +95,34 @@ abstract class Base
      */
     protected static function cleanFromBase($base)
     {
-        if ('bin' === $base) {
-            return array('bin2hex', 16);
-        }
+        switch ((string) $base) {
+            case 'bin':
+                return array('bin2hex', 16);
 
-        return array('trim', $base);
+            case 'dec':
+                return array('trim', 10);
+
+            case 'hex':
+                return array('trim', 16);
+
+            case 'oct':
+                return array('trim', 8);
+
+            default:
+                if (!is_numeric($base)) {
+                    throw new \RuntimeException(sprintf('Unknown base "%s"', $base));
+                }
+
+                $base = intval($base);
+                if (2 > $base || 36 < $base) {
+                    throw new \RuntimeException(sprintf(
+                        'Invalid "from base": must be in the range [2-36] but found "%s"',
+                        $base
+                    ));
+                }
+
+                return array('trim', $base);
+        }
     }
 
     /**
@@ -76,11 +134,34 @@ abstract class Base
      */
     protected static function cleanToBase($base)
     {
-        if ('bin' === $base) {
-            return array('hex2bin', 16);
-        }
+        switch ((string) $base) {
+            case 'bin':
+                return array('hex2bin', 16);
 
-        return array('trim', $base);
+            case 'dec':
+                return array('trim', 10);
+
+            case 'hex':
+                return array('trim', 16);
+
+            case 'oct':
+                return array('trim', 8);
+
+            default:
+                if (!is_numeric($base)) {
+                    throw new \RuntimeException(sprintf('Unknown base "%s"', $base));
+                }
+
+                $base = intval($base);
+                if (2 > $base || 36 < $base) {
+                    throw new \RuntimeException(sprintf(
+                        'Invalid "to base": must be in the range [2-36] but found "%s"',
+                        $base
+                    ));
+                }
+
+                return array('trim', $base);
+        }
     }
 
     /**
@@ -93,7 +174,9 @@ abstract class Base
      */
     protected static function convertFromBase10($number, $base)
     {
-        if (intval($base) == 10) {
+        self::checkNumber($number, 10);
+
+        if (10 === $base) {
             return empty($number) ? '0' : $number; // No conversion needed
         }
 
@@ -117,7 +200,9 @@ abstract class Base
      */
     protected static function convertToBase10($number, $base)
     {
-        if (intval($base) == 10) {
+        self::checkNumber($number, $base);
+
+        if (10 === $base) {
             return empty($number) ? '0' : $number; // No conversion needed
         }
 
