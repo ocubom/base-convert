@@ -206,8 +206,10 @@ abstract class Base
             return empty($number) ? '0' : $number; // No conversion needed
         }
 
+        $len = strlen($number);
+
         $value = 0;
-        for ($i = 0; $i < strlen($number); $i++) {
+        for ($i = 0; $i < $len; $i++) {
             $digit = base_convert($number[$i], $base, 10);
             $value = bcadd(bcmul($value, $base), $digit);
         }
