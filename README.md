@@ -17,7 +17,7 @@ Installation
 Just use [composer][] to add the dependency:
 
 ```
-composer require ocubom/base-convert:dev-master
+composer require ocubom/base-convert
 ```
 
 Or add the dependecy manually:
@@ -27,7 +27,7 @@ Or add the dependecy manually:
     ```
     {
         "require": {
-            "ocubom/base-convert": "dev-master"
+            "ocubom/base-convert": "^1.0.0"
         }
     }
     ```
