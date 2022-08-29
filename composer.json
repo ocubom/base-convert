@@ -1,40 +1,50 @@
 {
     "name" : "ocubom/base-convert",
+    "type": "library",
     "description" : "Safe number conversion between arbitrary bases.",
-    "keywords" : [ "big", "number", "base", "base32", "binary", "hexadecimal", "crockford", "big number", "precision", "arbitrary precision" ],
+    "keywords" : [
+        "big",
+        "number",
+        "base",
+        "base32",
+        "base",
+        "binary",
+        "hexadecimal",
+        "crockford",
+        "big number",
+        "precision",
+        "arbitrary precision"
+    ],
     "homepage" : "http://github.com/ocubom/base-convert",
     "license" : "MIT",
     "authors" : [{
         "name" : "Oscar Cubo Medina",
         "homepage" : "http://ocubom.github.io"
     }],
-    "support" : {
-        "issues" : "http://github.com/ocubom/base-convert/issues",
-        "source" : "http://github.com/ocubom/base-convert"
-    },
-
     "require": {
-        "ext-bcmath": "*",
-        "php": ">=5.4"
+        "php": ">=7.0"
     },
-
     "require-dev": {
-        "phpunit/phpunit": "~4.0"
+        "friendsofphp/php-cs-fixer": "*",
+        "symfony/phpunit-bridge": "^5.0 || ^6.0"
     },
-
+    "suggest": {
+    },
     "autoload": {
-        "psr-4": { "Ocubom\\Math\\": "src/" }
+        "psr-4": { "Ocubom\\Math\\": "src/" },
+        "files": [
+            "src/functions.php"
+        ]
     },
-
     "autoload-dev": {
         "psr-4": { "Ocubom\\Math\\Tests\\": "tests/" }
     },
-
-    "extra": {
-        "branch-alias": { "dev-master": "2.0.x-dev" }
+    "scripts": {
+        "fix": "./vendor/bin/php-cs-fixer fix",
+        "test": "./vendor/bin/simple-phpunit"
     },
-
-    "archive": {
-        "exclude": [ "tests", "*phpunit.xml*", "composer.phar" ]
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
     }
 }

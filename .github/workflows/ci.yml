@@ -1,0 +1,142 @@
+# @see https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+# @see https://github.com/shivammathur/setup-php/blob/master/examples/symfony.yml
+# @see https://about.codecov.io/blog/measuring-php-code-coverage-with-phpunit-and-github-actions/
+
+name: CI
+
+on:
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
+    #schedule:
+    #    -   cron: '30 0 * * *'
+
+permissions:
+    contents: read
+
+jobs:
+    test-suite:
+        name: Test Suite (PHP ${{ matrix.php-version }} on ${{ matrix.operating-system }})
+
+        runs-on: ${{ matrix.operating-system }}
+        continue-on-error: ${{ matrix.experimental }}
+
+        steps:
+            -   if: matrix.operating-system == 'windows-latest'
+                name: Configure git to avoid issues with line endings
+                run: git config --global core.autocrlf false
+
+            -   name: Checkout
+                uses: actions/checkout@v3
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-version }}
+                    #extensions: none
+                    ini-values: memory_limit=-1, max_execution_time=-1, post_max_size=256M
+                    tools: phpunit-bridge
+                    coverage: none
+
+            -   name: Cache composer packages
+                id: cache-composer
+                uses: actions/cache@v3
+                with:
+                    # Use composer.json for key as composer.lock is not committed.
+                    key: ${{ runner.os }}:php-${{ matrix.php-version }}:composer-${{ hashFiles('**/composer.json') }}
+                    path: |
+                        vendor
+                    restore-keys: |
+                        ${{ runner.os }}:php-${{ matrix.php-version }}:composer-${{ hashFiles('**/composer.json') }}
+                        ${{ runner.os }}:php-${{ matrix.php-version }}:
+
+            -   name: Install composer dependencies
+                run: composer install --no-progress --optimize-autoloader
+
+            -   name: Run test suite
+                run: simple-phpunit
+
+        strategy:
+            fail-fast: false
+            matrix:
+
+                operating-system:
+                    - ubuntu-latest
+                    - windows-latest
+                    - macos-latest
+
+                php-version:
+                    - '8.2'
+                    - '8.1'
+                    - '8.0'
+                    - '7.4'
+                    - '7.3'
+                    - '7.2'
+                    - '7.1'
+                    #- '7.0'
+                    #- '5.6'
+                    #- '5.5'
+                    #- '5.4'
+
+                experimental: [false]
+
+
+    code-coverage:
+        name: Code Coverage
+
+        needs:
+            - test-suite
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-version }}
+                    #extensions: none
+                    ini-values: memory_limit=-1, max_execution_time=-1, post_max_size=256M
+                    tools: phpunit-bridge
+                    coverage: ${{ fromJSON('["pcov", "xdebug"]')[matrix.php-version == '7.1' || (matrix.operating-system == 'macos-latest' && matrix.php-version == '8.2')] }}
+
+            -   name: Cache composer packages
+                id: cache-composer
+                uses: actions/cache@v3
+                with:
+                    # Use composer.json for key as composer.lock is not committed.
+                    key: ${{ runner.os }}:php-${{ matrix.php-version }}:composer-${{ hashFiles('**/composer.json') }}
+                    path: |
+                        vendor
+                    restore-keys: |
+                        ${{ runner.os }}:php-${{ matrix.php-version }}:composer-${{ hashFiles('**/composer.json') }}
+                        ${{ runner.os }}:php-${{ matrix.php-version }}:
+
+            -   name: Install composer dependencies
+                run: composer install --no-progress --optimize-autoloader
+
+            -   name: Collect code coverage with phpunit
+                run: simple-phpunit --coverage-clover=coverage.xml
+
+            -   name: Upload coverage to Codecov
+                uses: codecov/codecov-action@v3
+                with:
+                    token: ${{ secrets.CODECOV_TOKEN }}
+                    files: ./coverage.xml
+
+        strategy:
+            fail-fast: false
+            matrix:
+
+                operating-system:
+                    - ubuntu-latest
+                    #- windows-latest
+                    #- macos-latest
+
+                php-version:
+                    - '8.1'
+
+                experimental: [false]

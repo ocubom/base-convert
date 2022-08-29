@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of "Base Convert" component.
+ * This file is part of ocubom/base-convert
  *
- * © Oscar Cubo Medina <ocubom@gmail.com>
+ * © Oscar Cubo Medina <https://ocubom.github.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,209 +11,149 @@
 
 namespace Ocubom\Math;
 
-use \RuntimeException;
+use Ocubom\Math\Base\Binary;
+use Ocubom\Math\Base\Numeric;
 
 /**
- * BigNumber base convert encoders
+ * Base convert.
  *
  * @author Oscar Cubo Medina <ocubom@gmail.com>
  */
 abstract class Base
 {
-    /**
-     * Base-36 alphabet
-     */
-    const BASE36_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz';
+    private static $bases = [
+        'bin' => Binary::class,
+        'binary' => Binary::class,
+    ];
 
     /**
-     * Safe convert of numbers using BC math extension
+     * Convert a number between arbitrary bases.
      *
-     * {@see http://www.php.net/manual/es/function.base-convert.php#109660}
+     * @param int|string      $number The number to convert. Any invalid characters in num are silently ignored. As of PHP 7.4.0 supplying any invalid characters is deprecated.
+     * @param int|string|Base $source The base number is in
+     * @param int|string|Base $target The base to convert num to
      *
-     * @param mixed $number   Number to convert
-     * @param mixed $frombase Original base for number
-     * @param mixed $tobase   Desired base for number
-     *
-     * @return mixed Number in desired base (string or binary)
+     * @return string
      */
-    public static function convert($number, $frombase = 10, $tobase = 36)
+    final public static function convert($number, $source, $target)
     {
-        if ($frombase == $tobase) {
-            return $number;  // No conversion needed
+        // Filter bases
+        $source = self::filterBase($source);
+        $target = self::filterBase($target);
+        if ($source == $target) {
+            return (is_numeric($number) ? strval($number) : $number) ?: '0';
         }
 
-        // Get pre & post conversion process
-        list($prefn,  $frombase) = self::cleanFromBase($frombase);
-        list($postfn, $tobase)   = self::cleanToBase($tobase);
+        // Filter number with source base
+        $number = $source->filterValue($number);
 
-        // Perform conversion
-        $result = $prefn($number);
-        if ($frombase != $tobase) {
-            $result = self::convertFromBase10(self::convertToBase10($result, $frombase), $tobase);
-        }
-        $result = $postfn($result);
+        // Do base conversions
+        $number = self::fromBase($number, $source->getMap());
+        $number = self::toBase($number, $target->getMap());
 
-        return empty($result) ? '0' : $result;
+        // Prepare the final value
+        return $target->returnValue($number);
     }
 
     /**
-     * Check if number has valid digits
+     * Filter & validate base.
      *
-     * @param mixed   $number The number to check
-     * @param integer $base   The base of $number
+     * @param string|int|BaseInterface $base
      *
-     * @return boolean False if the number is valid
+     * @return BaseInterface
+     *
+     * @throws \ReflectionException
      */
-    protected static function checkNumber($number, $base)
+    final public static function filterBase($base)
     {
-        $invalid = array_diff(
-            str_split(strtolower($number) ?: '0'),
-            str_split(substr(self::BASE36_ALPHABET, 0, $base))
-        );
-
-        if (empty($invalid)) {
-            return false; // Number is valid
+        if ($base instanceof BaseInterface) {
+            return $base;
         }
 
-        $invalid = array_unique($invalid);
-        usort($invalid, 'strnatcasecmp');
+        if ($class = self::$bases[strtolower($base)] ?? null) {
+            $class = new \ReflectionClass($class);
 
-        throw new \RuntimeException(sprintf(
-            'Found invalid characters "%s" for base-%d on number "%s"',
-            implode('', $invalid),
-            $base,
-            $number
-        ));
+            return $class->newInstanceArgs();
+        }
+
+        return new Numeric($base);
     }
 
     /**
-     * Clean source number base
+     * The following method was extracted from symfony/uid (v6.1.4).
      *
-     * @param mixed $base Source base
+     * Code subject to the MIT license (https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/LICENSE)
      *
-     * @return array Pre-process function and returned base of the function
+     * Copyright (c) 2020-2022 Fabien Potencier
+     *
+     * @see https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/BinaryUtil.php#L74
      */
-    protected static function cleanFromBase($base)
+    final private static function fromBase($digits, $map)
     {
-        switch ((string) $base) {
-            case 'bin':
-                return array('bin2hex', 16);
+        $base = \strlen($map['']);
+        $count = \strlen($digits);
+        $bytes = [];
 
-            case 'dec':
-                return array('trim', 10);
+        while ($count) {
+            $quotient = [];
+            $remainder = 0;
 
-            case 'hex':
-                return array('trim', 16);
+            for ($i = 0; $i !== $count; ++$i) {
+                $carry = ($bytes ? $digits[$i] : $map[$digits[$i]]) + $remainder * $base;
 
-            case 'oct':
-                return array('trim', 8);
-
-            default:
-                if (!is_numeric($base)) {
-                    throw new \RuntimeException(sprintf('Unknown base "%s"', $base));
+                if (\PHP_INT_SIZE >= 8) {
+                    $digit = $carry >> 16;
+                    $remainder = $carry & 0xFFFF;
+                } else {
+                    $digit = $carry >> 8;
+                    $remainder = $carry & 0xFF;
                 }
 
-                $base = intval($base);
-                if (2 > $base || 36 < $base) {
-                    throw new \RuntimeException(sprintf(
-                        'Invalid "from base": must be in the range [2-36] but found "%s"',
-                        $base
-                    ));
+                if ($digit || $quotient) {
+                    $quotient[] = $digit;
                 }
+            }
 
-                return array('trim', $base);
+            $bytes[] = $remainder;
+            $count = \count($digits = $quotient);
         }
+
+        return pack(\PHP_INT_SIZE >= 8 ? 'n*' : 'C*', ...array_reverse($bytes));
     }
 
     /**
-     * Clean target number base
+     * The following method was extracted from symfony/uid (v6.1.4).
      *
-     * @param mixed $base Target base
+     * Code subject to the MIT license (https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/LICENSE)
      *
-     * @return array Post-process function and input base of the function
+     * Copyright (c) 2020-2022 Fabien Potencier
+     *
+     * @see https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/BinaryUtil.php#L47
      */
-    protected static function cleanToBase($base)
+    final private static function toBase($bytes, $map)
     {
-        switch ((string) $base) {
-            case 'bin':
-                return array('hex2bin', 16);
+        $base = \strlen($alphabet = $map['']);
+        $bytes = array_values(unpack(\PHP_INT_SIZE >= 8 ? 'n*' : 'C*', $bytes));
+        $digits = '';
 
-            case 'dec':
-                return array('trim', 10);
+        while ($count = \count($bytes)) {
+            $quotient = [];
+            $remainder = 0;
 
-            case 'hex':
-                return array('trim', 16);
+            for ($i = 0; $i !== $count; ++$i) {
+                $carry = $bytes[$i] + ($remainder << (\PHP_INT_SIZE >= 8 ? 16 : 8));
+                $digit = intdiv($carry, $base);
+                $remainder = $carry % $base;
 
-            case 'oct':
-                return array('trim', 8);
-
-            default:
-                if (!is_numeric($base)) {
-                    throw new \RuntimeException(sprintf('Unknown base "%s"', $base));
+                if ($digit || $quotient) {
+                    $quotient[] = $digit;
                 }
+            }
 
-                $base = intval($base);
-                if (2 > $base || 36 < $base) {
-                    throw new \RuntimeException(sprintf(
-                        'Invalid "to base": must be in the range [2-36] but found "%s"',
-                        $base
-                    ));
-                }
-
-                return array('trim', $base);
-        }
-    }
-
-    /**
-     * Convert a number from base10 to the desired base
-     *
-     * @param mixed $number The number to convert in base10
-     * @param mixed $base   The new base
-     *
-     * @return mixed $number converted to $base
-     */
-    protected static function convertFromBase10($number, $base)
-    {
-        self::checkNumber($number, 10);
-
-        if (10 === $base) {
-            return empty($number) ? '0' : $number; // No conversion needed
+            $digits = $alphabet[$remainder].$digits;
+            $bytes = $quotient;
         }
 
-        $value = '';
-        while (bccomp($number, '0', 0) > 0) {
-            $module = intval(bcmod($number, $base));
-            $value  = base_convert($module, 10, $base) . $value;
-            $number = bcdiv($number, $base, 0);
-        }
-
-        return empty($value) ? '0' : $value;
-    }
-
-    /**
-     * Convert the number from its base to base10
-     *
-     * @param mixed $number The number to convert
-     * @param mixed $base   The base of the number
-     *
-     * @return mixed $number converted to base10
-     */
-    protected static function convertToBase10($number, $base)
-    {
-        self::checkNumber($number, $base);
-
-        if (10 === $base) {
-            return empty($number) ? '0' : $number; // No conversion needed
-        }
-
-        $len = strlen($number);
-
-        $value = 0;
-        for ($i = 0; $i < $len; $i++) {
-            $digit = base_convert($number[$i], $base, 10);
-            $value = bcadd(bcmul($value, $base), $digit);
-        }
-
-        return empty($value) ? '0' : $value;
+        return $digits;
     }
 }

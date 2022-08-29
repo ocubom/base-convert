@@ -1,18 +1,6 @@
-##
-##      .gitignore -- Specifies intentionally untracked files to ignore
-##      ===============================================================
-##
-## See: http://www.kernel.org/pub/software/scm/git/docs/gitignore.html
-##
-
-## ----------------------------------------------------------------------------
-##  project specific files
-## ----------------------------------------------------------------------------
-
-build/
-composer.lock
-composer.phar
-phpunit.xml
 vendor/
-
-!.travis.yml
+build/
+.php-cs-fixer.cache
+.phpunit.*.cache
+composer.lock
+phpunit.xml
