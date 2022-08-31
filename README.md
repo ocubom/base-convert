@@ -12,7 +12,8 @@ Safe number conversion between arbitrary bases.
 [![License][license-img]][license-url]
 [![Version][packagist-img]][packagist-url]
 [![CI][workflow-ci-img]][workflow-ci-url]
-[![Coverage][coverage-ci-img]][coverage-ci-url]
+[![Code Quality][quality-img]][quality-url]
+[![Coverage][coverage-img]][coverage-url]
 
 [**Explore the docs »**](https://github.com/ocubom/base-convert)
 
@@ -274,7 +275,9 @@ See [LICENSE][] for more information.
 [license-url]:      https://github.com/ocubom/base-convert/blob/master/LICENSE
 [workflow-ci-img]:  https://img.shields.io/github/workflow/status/ocubom/base-convert/test.svg?label=CI&logo=github&style=for-the-badge
 [workflow-ci-url]:  https://github.com/ocubom/base-convert/actions/
-[coverage-ci-img]:  https://img.shields.io/codecov/c/github/ocubom/base-convert.svg?logo=codecov&logoColor=%23fefefe&style=for-the-badge&token=NQOE5BY6MX
-[coverage-ci-url]:  https://app.codecov.io/gh/ocubom/base-convert
 [packagist-img]:    https://img.shields.io/packagist/v/ocubom/base-convert.svg?logo=packagist&logoColor=%23fefefe&style=for-the-badge
 [packagist-url]:    https://packagist.org/packages/ocubom/base-convert
+[coverage-img]:     https://img.shields.io/scrutinizer/coverage/g/ocubom/base-convert.svg?logo=scrutinizer&logoColor=fff&style=for-the-badge
+[coverage-url]:     https://app.codecov.io/gh/ocubom/base-convert
+[quality-img]:      https://img.shields.io/scrutinizer/quality/g/ocubom/base-convert.svg?logo=scrutinizer&logoColor=fff&style=for-the-badge
+[quality-url]:      https://scrutinizer-ci.com/g/ocubom/base-convert/

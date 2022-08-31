@@ -166,8 +166,9 @@ jobs:
             -   name: Collect code coverage
                 run: simple-phpunit --coverage-clover=coverage.xml
 
-            -   name: Upload coverage to Codecov
-                uses: codecov/codecov-action@v3
+            -   name: Upload coverage to Scrutinizer
+                uses: sudo-bot/action-scrutinizer@latest
+                # Do not run this step on forked versions of the main repository (example: contributor forks)
+                #if: github.repository == 'ocubom/dummy-test'
                 with:
-                    token: ${{ secrets.CODECOV_TOKEN }}
-                    files: ./coverage.xml
+                    cli-args: "--format=php-clover coverage.xml --revision=${{ github.event.pull_request.head.sha || github.sha }}"
