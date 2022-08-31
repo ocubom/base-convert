@@ -13,6 +13,7 @@ namespace Ocubom\Math;
 
 use Ocubom\Math\Base\Binary;
 use Ocubom\Math\Base\Numeric;
+use Ocubom\Math\Exception\InvalidArgumentException;
 
 /**
  * Base convert.
@@ -63,8 +64,6 @@ abstract class Base
      * Filter & validate base.
      *
      * @param BaseInterface|string|int $base
-     *
-     * @throws \ReflectionException
      */
     final public static function filterBase($base): BaseInterface
     {
@@ -73,11 +72,14 @@ abstract class Base
         }
 
         if ($class = self::$bases[strtolower((string) $base)] ?? null) {
-            /** @var BaseInterface $object */
-            $object = (new \ReflectionClass($class))->newInstance();
+            try {
+                $object = (new \ReflectionClass($class))->newInstance();
 
-            if ($object instanceof BaseInterface) {
-                return $object;
+                if ($object instanceof BaseInterface) {
+                    return $object;
+                }
+            } catch (\ReflectionException $exc) {
+                throw new InvalidArgumentException("Invalid base ({$base})", 0, $exc); // @codeCoverageIgnore
             }
         }
 

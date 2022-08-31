@@ -21,9 +21,8 @@ abstract class AbstractBase implements BaseInterface
         $number = (is_numeric($value) ? strval($value) : $value) ?: '0';
 
         // Check if some digit is invalid
-        $digits = str_split($number);
         $invalid = array_diff_key(
-            array_combine($digits, $digits),
+            array_flip(str_split($number)),
             $this->getMap()
         );
 

@@ -278,6 +278,6 @@ See [LICENSE][] for more information.
 [packagist-img]:    https://img.shields.io/packagist/v/ocubom/base-convert.svg?logo=packagist&logoColor=%23fefefe&style=for-the-badge
 [packagist-url]:    https://packagist.org/packages/ocubom/base-convert
 [coverage-img]:     https://img.shields.io/scrutinizer/coverage/g/ocubom/base-convert.svg?logo=scrutinizer&logoColor=fff&style=for-the-badge
-[coverage-url]:     https://app.codecov.io/gh/ocubom/base-convert
+[coverage-url]:     https://scrutinizer-ci.com/g/ocubom/base-convert/code-structure/main/code-coverage
 [quality-img]:      https://img.shields.io/scrutinizer/quality/g/ocubom/base-convert.svg?logo=scrutinizer&logoColor=fff&style=for-the-badge
 [quality-url]:      https://scrutinizer-ci.com/g/ocubom/base-convert/

@@ -73,28 +73,36 @@ class Crockford extends AbstractBase
 
         // Ignore hyphens (improving readability)
         $number = str_replace('-', '', $number);
-        $check = '';
 
-        // Extract checksum
-        if ($this->checksum) {
-            $check = substr($number, -1);
-            if (!isset(self::MAP[$check]) && !isset(self::CHECKSUM[$check])) {
-                throw new InvalidArgumentException(sprintf(
-                    'Invalid %s check symbol "%s" found on "%s"',
-                    (string) $this,
-                    $check,
-                    $value
-                ));
-            }
+        return $this->checksum
+            ? $this->filterValueWithChecksum($number)
+            : parent::filterValue($number);
+    }
 
-            $number = substr($number, 0, -1);
+    public function returnValue($value): string
+    {
+        $value = parent::returnValue($value);
+
+        return $value.($this->checksum ? self::checksum($value) : '');
+    }
+
+    private function filterValueWithChecksum(string $value): string
+    {
+        $number = parent::filterValue(substr($value, 0, -1));
+        $check = substr($value, -1);
+
+        // Verify checksum character validity
+        if (!isset(self::MAP[$check]) && !isset(self::CHECKSUM[$check])) {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid %s check symbol "%s" found on "%s"',
+                (string) $this,
+                $check,
+                $value
+            ));
         }
 
-        // Perform standard checks
-        $number = parent::filterValue($number);
-
         // Verify checksum value
-        if ($this->checksum && ($check !== $valid = $this->checksum($number))) {
+        if ($check !== $valid = $this->checksum($number)) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid %s checksum for "%s", found "%s" must be "%s"',
                 (string) $this,
@@ -105,13 +113,6 @@ class Crockford extends AbstractBase
         }
 
         return $number;
-    }
-
-    public function returnValue($value): string
-    {
-        $value = parent::returnValue($value);
-
-        return $value.($this->checksum ? self::checksum($value) : '');
     }
 
     /**
