@@ -78,7 +78,7 @@ abstract class Base
                 if ($object instanceof BaseInterface) {
                     return $object;
                 }
-            } catch (\ReflectionException $exc) {
+            } catch (\ReflectionException $exc) { // @codeCoverageIgnore
                 throw new InvalidArgumentException("Invalid base ({$base})", 0, $exc); // @codeCoverageIgnore
             }
         }
