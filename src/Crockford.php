@@ -15,12 +15,26 @@ use Ocubom\Math\Base\Crockford as BaseCrockford;
 
 abstract class Crockford
 {
-    final public static function encode($number, $base, $checksum = false)
+    /**
+     * Convert a number to crockford base32 encoding.
+     *
+     * @param int|string               $number   The number to convert
+     * @param BaseInterface|int|string $base     The base of $number
+     * @param bool                     $checksum Include a checksum
+     */
+    final public static function encode($number, $base, bool $checksum = false): string
     {
         return Base::convert($number, $base, new BaseCrockford($checksum));
     }
 
-    final public static function decode($number, $base, $checksum = false)
+    /**
+     * Convert a number from crockford base32 encoding.
+     *
+     * @param int|string               $number   The crockford number to convert
+     * @param BaseInterface|int|string $base     The base to covert $number
+     * @param bool                     $checksum Include a checksum
+     */
+    final public static function decode($number, $base, bool $checksum = false): string
     {
         return Base::convert($number, new BaseCrockford($checksum), $base);
     }

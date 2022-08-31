@@ -19,13 +19,11 @@ namespace Ocubom\Math;
  * @see http://php.net/manual/en/function.base-convert.php
  * @see http://php.net/manual/en/function.base-convert.php#109660
  *
- * @param string|int               $number The number to convert
- * @param string|int|BaseInterface $source Original base for number
- * @param string|int|BaseInterface $target Desired base for number
- *
- * @return string Number in desired base (string or binary)
+ * @param int|string               $number The number to convert
+ * @param BaseInterface|int|string $source Original base for number
+ * @param BaseInterface|int|string $target Desired base for number
  */
-function base_convert($number, $source, $target)
+function base_convert($number, $source, $target): string
 {
     return Base::convert($number, $source, $target);
 }
@@ -33,13 +31,11 @@ function base_convert($number, $source, $target)
 /**
  * Convert a number to crockford base32 encoding.
  *
- * @param string|int               $number   The number to convert
- * @param string|int|BaseInterface $base     The base of $number
+ * @param int|string               $number   The number to convert
+ * @param BaseInterface|int|string $base     The base of $number
  * @param bool                     $checksum Include a checksum
- *
- * @return string
  */
-function crockford_encode($number, $base, $checksum = false)
+function crockford_encode($number, $base, bool $checksum = false): string
 {
     return Crockford::encode($number, $base, $checksum);
 }
@@ -47,13 +43,11 @@ function crockford_encode($number, $base, $checksum = false)
 /**
  * Convert a number from crockford base32 encoding.
  *
- * @param string|int               $number   The crockford number to convert
- * @param string|int|BaseInterface $base     The base to covert $number
- * @param bool                     $checksum Include a checksum
- *
- * @return int|string
+ * @param int|string               $number   The crockford number to convert
+ * @param BaseInterface|int|string $base     The base to convert $number
+ * @param bool                     $checksum Includes $number a checksum?
  */
-function crockford_decode($number, $base, $checksum = false)
+function crockford_decode($number, $base, bool $checksum = false): string
 {
     return Crockford::decode($number, $base, $checksum);
 }

@@ -35,7 +35,7 @@ return (new PhpCsFixer\Config())
             ->ignoreDotFiles(true)
             ->ignoreVCS(true)
             ->ignoreVCSIgnored(true)
-            //->append([__FILE__])
+            ->append([__FILE__])
     )
     ->setRules([
         // Rulesets
@@ -55,7 +55,6 @@ return (new PhpCsFixer\Config())
         'single_line_throw' => false,
         // PHPdoc
         'no_superfluous_phpdoc_tags' => ['remove_inheritdoc' => true],
-
     ])
     ->setCacheFile(tempnam(sys_get_temp_dir(), 'php-cs-fixer'))
-;
+    ;

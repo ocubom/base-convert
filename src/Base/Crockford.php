@@ -62,12 +62,12 @@ class Crockford extends AbstractBase
         $this->checksum = $checksum;
     }
 
-    public function getMap()
+    public function getMap(): array
     {
         return self::MAP;
     }
 
-    public function filterValue($value)
+    public function filterValue($value): string
     {
         $number = (is_numeric($value) ? strval($value) : $value) ?: ($this->checksum ? '00' : '0');
 
@@ -106,7 +106,7 @@ class Crockford extends AbstractBase
         return $number;
     }
 
-    public function returnValue($value)
+    public function returnValue($value): string
     {
         $value = parent::returnValue($value);
 
@@ -120,7 +120,7 @@ class Crockford extends AbstractBase
      *
      * @return string The crockford encoded checksum
      */
-    private static function checksum(string $number)
+    private static function checksum(string $number): string
     {
         $value = str_replace('-', '', $number);
         $value = Base::convert($value, new Crockford(false), 10);

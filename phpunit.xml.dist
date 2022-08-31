@@ -15,6 +15,9 @@
         <include>
             <directory suffix=".php">src</directory>
         </include>
+        <exclude>
+            <file>src/polyfill.php</file>
+        </exclude>
         <report>
             <!-- clover outputFile=".phpunit-reports/clover.xml" /-->
             <!-- cobertura outputFile=".phpunit-reports/cobertura.xml" /-->
@@ -30,6 +33,9 @@
     <filter>
         <whitelist>
             <directory suffix=".php">src</directory>
+            <exclude>
+                <file>src/polyfill.php</file>
+            </exclude>
         </whitelist>
     </filter>
 

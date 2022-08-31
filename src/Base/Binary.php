@@ -20,12 +20,12 @@ class Binary extends Numeric
         parent::__construct(16); // Uses Hex as internal format to use hex2bin and bin2hex functions
     }
 
-    public function filterValue($number)
+    public function filterValue($value): string
     {
-        return bin2hex($number);
+        return bin2hex($value);
     }
 
-    public function returnValue($value)
+    public function returnValue($value): string
     {
         // Must be left padded to force even length
         $len = strlen($value);

@@ -33,6 +33,7 @@
     "autoload": {
         "psr-4": { "Ocubom\\Math\\": "src/" },
         "files": [
+            "src/polyfill.php",
             "src/functions.php"
         ]
     },

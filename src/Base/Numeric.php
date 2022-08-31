@@ -68,7 +68,7 @@ class Numeric extends AbstractBase
         }
     }
 
-    public function getMap()
+    public function getMap(): array
     {
         if (!array_key_exists($this->value, self::$maps)) {
             // Extract valid symbols
@@ -95,11 +95,10 @@ class Numeric extends AbstractBase
             self::$maps[$this->value] = $mapping;
         }
 
-
         return self::$maps[$this->value];
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'Base'.$this->value;
     }

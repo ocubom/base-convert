@@ -15,10 +15,10 @@ use Ocubom\Math\Exception\InvalidArgumentException;
 
 abstract class AbstractBase implements BaseInterface
 {
-    public function filterValue($number)
+    public function filterValue($value): string
     {
         // Force value as string representation of the number
-        $number = (is_numeric($number) ? strval($number) : $number) ?: '0';
+        $number = (is_numeric($value) ? strval($value) : $value) ?: '0';
 
         // Check if some digit is invalid
         $digits = str_split($number);
@@ -41,12 +41,12 @@ abstract class AbstractBase implements BaseInterface
         return $number;
     }
 
-    public function returnValue($value)
+    public function returnValue($value): string
     {
         return (is_numeric($value) ? strval($value) : $value) ?: '0';
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return strtolower((new \ReflectionClass($this))->getShortName());
     }

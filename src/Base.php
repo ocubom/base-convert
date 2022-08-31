@@ -29,13 +29,16 @@ abstract class Base
     /**
      * Convert a number between arbitrary bases.
      *
-     * @param int|string      $number The number to convert. Any invalid characters in num are silently ignored. As of PHP 7.4.0 supplying any invalid characters is deprecated.
-     * @param int|string|Base $source The base number is in
-     * @param int|string|Base $target The base to convert num to
+     * Supports large arbitrary numbers by using a safe php implementation
      *
-     * @return string
+     * @see http://php.net/manual/en/function.base-convert.php
+     * @see http://php.net/manual/en/function.base-convert.php#109660
+     *
+     * @param int|string               $number The number to convert
+     * @param BaseInterface|int|string $source Original base for number
+     * @param BaseInterface|int|string $target Desired base for number
      */
-    final public static function convert($number, $source, $target)
+    final public static function convert($number, $source, $target): string
     {
         // Filter bases
         $source = self::filterBase($source);
@@ -58,13 +61,11 @@ abstract class Base
     /**
      * Filter & validate base.
      *
-     * @param string|int|BaseInterface $base
-     *
-     * @return BaseInterface
+     * @param BaseInterface|string|int $base
      *
      * @throws \ReflectionException
      */
-    final public static function filterBase($base)
+    final public static function filterBase($base): BaseInterface
     {
         if ($base instanceof BaseInterface) {
             return $base;
@@ -73,7 +74,7 @@ abstract class Base
         if ($class = self::$bases[strtolower($base)] ?? null) {
             $class = new \ReflectionClass($class);
 
-            return $class->newInstanceArgs();
+            return $class->newInstance();
         }
 
         return new Numeric($base);
@@ -88,7 +89,7 @@ abstract class Base
      *
      * @see https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/BinaryUtil.php#L74
      */
-    final private static function fromBase($digits, $map)
+    public static function fromBase(string $digits, array $map): string
     {
         $base = \strlen($map['']);
         $count = \strlen($digits);
@@ -130,7 +131,7 @@ abstract class Base
      *
      * @see https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/BinaryUtil.php#L47
      */
-    final private static function toBase($bytes, $map)
+    public static function toBase(string $bytes, array $map): string
     {
         $base = \strlen($alphabet = $map['']);
         $bytes = array_values(unpack(\PHP_INT_SIZE >= 8 ? 'n*' : 'C*', $bytes));

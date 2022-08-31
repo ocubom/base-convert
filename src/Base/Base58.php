@@ -34,7 +34,7 @@ class Base58 extends AbstractBase
         'u' => 52, 'v' => 53, 'w' => 54, 'x' => 55, 'y' => 56, 'z' => 57,
     ];
 
-    public function getMap()
+    public function getMap(): array
     {
         return self::MAP;
     }

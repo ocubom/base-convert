@@ -11,7 +11,7 @@
 
 namespace Ocubom\Math;
 
-interface BaseInterface
+interface BaseInterface extends \Stringable
 {
     /**
      * Provides the map for conversion.
@@ -19,31 +19,24 @@ interface BaseInterface
      * The format is the same used in symfony/uid component.
      *
      * @see https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/BinaryUtil.php
-     *
-     * @return array
      */
-    public function getMap();
+    public function getMap(): array;
 
     /**
      * Validate the value against the base.
      *
-     * @param string|int $number The value to check
+     * @param int|string $value The value to check
      *
      * @return string The filtered valid value
      */
-    public function filterValue($number);
+    public function filterValue($value): string;
 
     /**
      * Normalize the value to return.
      *
-     * @param string|int $value the value to return
+     * @param string $value the value to return
      *
      * @return string The normalized value
      */
-    public function returnValue($value);
-
-    /**
-     * @return string
-     */
-    public function __toString();
+    public function returnValue($value): string;
 }
