@@ -43,13 +43,10 @@ class Numeric extends AbstractBase
         'max_range' => 62,
     ]];
 
-    /**
-     * Base value.
-     *
-     * @var int
-     */
+    /** @var int */
     private $value;
 
+    /** @var array */
     private static $maps = [];
 
     /**
@@ -57,15 +54,17 @@ class Numeric extends AbstractBase
      */
     public function __construct($base)
     {
-        $this->value = filter_var(
-            self::NAMED_BASES[strtolower($base)] ?? $base,
+        $value = filter_var(
+            self::NAMED_BASES[strtolower((string) $base)] ?? $base,
             \FILTER_VALIDATE_INT,
             self::OPTIONS
         );
 
-        if (false === $this->value) {
+        if (false === $value) {
             throw new InvalidArgumentException("Invalid base ({$base}), must be in the range [2-62]");
         }
+
+        $this->value = $value;
     }
 
     public function getMap(): array
@@ -75,18 +74,13 @@ class Numeric extends AbstractBase
             $symbols = substr(self::SYMBOLS, 0, $this->value);
 
             // Create reverse mapping
-            $mapping = str_split($symbols);
-            $mapping = array_combine(array_values($mapping), array_keys($mapping));
+            $mapping = array_flip(str_split($symbols));
 
             // For bases up to 36, case is ignored
             if ($this->value <= 36) {
                 // User lowercase letters for compatibility with native base_convert
                 $symbols = strtolower($symbols);
-
-                $lowers = str_split($symbols);
-                $lowers = array_combine(array_values($lowers), array_keys($lowers));
-
-                $mapping = array_merge($mapping, array_slice($lowers, 10));
+                $mapping = array_merge($mapping, array_slice(array_flip(str_split($symbols)), 10));
             }
 
             // Add special symbols entry

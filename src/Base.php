@@ -21,6 +21,7 @@ use Ocubom\Math\Base\Numeric;
  */
 abstract class Base
 {
+    /** @var class-string[] */
     private static $bases = [
         'bin' => Binary::class,
         'binary' => Binary::class,
@@ -71,13 +72,16 @@ abstract class Base
             return $base;
         }
 
-        if ($class = self::$bases[strtolower($base)] ?? null) {
-            $class = new \ReflectionClass($class);
+        if ($class = self::$bases[strtolower((string) $base)] ?? null) {
+            /** @var BaseInterface $object */
+            $object = (new \ReflectionClass($class))->newInstance();
 
-            return $class->newInstance();
+            if ($object instanceof BaseInterface) {
+                return $object;
+            }
         }
 
-        return new Numeric($base);
+        return new Numeric((string) $base);
     }
 
     /**

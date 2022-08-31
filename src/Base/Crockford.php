@@ -73,6 +73,7 @@ class Crockford extends AbstractBase
 
         // Ignore hyphens (improving readability)
         $number = str_replace('-', '', $number);
+        $check = '';
 
         // Extract checksum
         if ($this->checksum) {
@@ -80,7 +81,7 @@ class Crockford extends AbstractBase
             if (!isset(self::MAP[$check]) && !isset(self::CHECKSUM[$check])) {
                 throw new InvalidArgumentException(sprintf(
                     'Invalid %s check symbol "%s" found on "%s"',
-                    $this,
+                    (string) $this,
                     $check,
                     $value
                 ));
@@ -96,7 +97,7 @@ class Crockford extends AbstractBase
         if ($this->checksum && ($check !== $valid = $this->checksum($number))) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid %s checksum for "%s", found "%s" must be "%s"',
-                $this,
+                (string) $this,
                 $value,
                 $check,
                 $valid
@@ -135,9 +136,9 @@ class Crockford extends AbstractBase
      * @param string $num1 The dividend (base-10 string)
      * @param int    $num2 The divisor
      *
-     * @return string Remainder of $num1/$num2
+     * @return int Remainder of $num1/$num2
      */
-    private static function mod(string $num1, int $num2): string
+    private static function mod(string $num1, int $num2): int
     {
         $mod = 0;
         foreach (str_split($num1) as $digit) {

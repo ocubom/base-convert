@@ -22,7 +22,7 @@ class Binary extends Numeric
 
     public function filterValue($value): string
     {
-        return bin2hex($value);
+        return bin2hex((string) $value);
     }
 
     public function returnValue($value): string

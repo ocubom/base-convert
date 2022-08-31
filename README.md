@@ -251,7 +251,7 @@ See [LICENSE][] for more information.
     "PHP bin2hex"
 
 [hex2bin]: https://www.php.net/manual/function.hex2bin.php
-"PHP hex2bin"
+    "PHP hex2bin"
 
 [bindec]: https://www.php.net/manual/function.bindec.php
     "PHP bindec"

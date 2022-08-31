@@ -32,9 +32,9 @@ abstract class AbstractBase implements BaseInterface
 
             throw new InvalidArgumentException(sprintf(
                 'Found %s invalid characters "%s" on number "%s"',
-                $this,
+                (string) $this,
                 implode('', array_keys($invalid)),
-                (string) $number
+                $number
             ));
         }
 
