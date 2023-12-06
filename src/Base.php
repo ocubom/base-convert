@@ -87,13 +87,13 @@ abstract class Base
     }
 
     /**
-     * The following method was extracted from symfony/uid (v6.1.4).
+     * The following method was extracted from symfony/uid (v7.0.1).
      *
-     * Code subject to the MIT license (https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/LICENSE)
+     * Code subject to the MIT license (https://github.com/symfony/symfony/blob/v7.0.1/src/Symfony/Component/Uid/LICENSE)
      *
      * Copyright (c) 2020-2022 Fabien Potencier
      *
-     * @see https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/BinaryUtil.php#L74
+     * @see https://github.com/symfony/symfony/blob/v7.0.1/src/Symfony/Component/Uid/BinaryUtil.php#L74
      */
     public static function fromBase(string $digits, array $map): string
     {
@@ -129,13 +129,13 @@ abstract class Base
     }
 
     /**
-     * The following method was extracted from symfony/uid (v6.1.4).
+     * The following method was extracted from symfony/uid (v7.0.1).
      *
-     * Code subject to the MIT license (https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/LICENSE)
+     * Code subject to the MIT license (https://github.com/symfony/symfony/blob/v7.0.1/src/Symfony/Component/Uid/LICENSE)
      *
      * Copyright (c) 2020-2022 Fabien Potencier
      *
-     * @see https://github.com/symfony/symfony/blob/v6.1.4/src/Symfony/Component/Uid/BinaryUtil.php#L47
+     * @see https://github.com/symfony/symfony/blob/v7.0.1/src/Symfony/Component/Uid/BinaryUtil.php#L47
      */
     public static function toBase(string $bytes, array $map): string
     {
