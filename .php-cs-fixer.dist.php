@@ -57,4 +57,4 @@ return (new PhpCsFixer\Config())
         'no_superfluous_phpdoc_tags' => ['remove_inheritdoc' => true],
     ])
     ->setCacheFile(tempnam(sys_get_temp_dir(), 'php-cs-fixer'))
-    ;
+;

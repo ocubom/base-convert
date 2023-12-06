@@ -12,8 +12,9 @@
 namespace Ocubom\Math\Tests;
 
 use Ocubom\Math\Base;
-use function Ocubom\Math\base_convert;
 use Ocubom\Math\Exception\InvalidArgumentException;
+
+use function Ocubom\Math\base_convert;
 
 /**
  * Test BigNumber base convert utility functions.
@@ -25,7 +26,7 @@ class BaseConvertTest extends TestCase
     const MIN_BASE = 2;
     const MAX_BASE = 62;
 
-    public static $bytes = null;
+    public static $bytes;
 
     public function testEmptyNumberMustReturnZeroInAnyConversion()
     {

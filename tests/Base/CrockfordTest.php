@@ -12,10 +12,11 @@
 namespace Ocubom\Math\Tests\Base;
 
 use Ocubom\Math\Base\Crockford;
-use function Ocubom\Math\crockford_decode;
-use function Ocubom\Math\crockford_encode;
 use Ocubom\Math\Exception\InvalidArgumentException;
 use Ocubom\Math\Tests\TestCase;
+
+use function Ocubom\Math\crockford_decode;
+use function Ocubom\Math\crockford_encode;
 
 class CrockfordTest extends TestCase
 {
